@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理员审批 - 校园活动管理系统</title>
+    <title>参与者主页 - 校园活动管理系统</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
+        .activity-card {
+            transition: transform 0.2s ease-in-out;
+            border: 1px solid #dee2e6;
+        }
+        .activity-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.8em;
+        }
         .sidebar {
             min-height: 100vh;
             background-color: #f8f9fa;
@@ -14,78 +25,25 @@
         .main-content {
             padding: 2rem;
         }
-        .approval-card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-bottom: 1rem;
+        .activity-meta {
+            font-size: 0.9em;
+            color: #6c757d;
         }
-        .approval-header {
+        .progress-section {
             background-color: #f8f9fa;
-            padding: 1rem;
-            border-bottom: 1px solid #dee2e6;
-        }
-        .approval-body {
-            padding: 1rem;
-        }
-        .priority-high {
-            border-left: 4px solid #dc3545;
-        }
-        .priority-medium {
-            border-left: 4px solid #ffc107;
-        }
-        .priority-low {
-            border-left: 4px solid #28a745;
-        }
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        .status-approved {
-            background-color: #d1edff;
-            color: #0c5460;
-        }
-        .status-rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .quick-actions {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        .venue-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        .venue-card {
-            border: 1px solid #dee2e6;
             border-radius: 8px;
             padding: 1rem;
-            text-align: center;
-        }
-        .venue-available {
-            background-color: #d1edff;
-            border-color: #0c5460;
-        }
-        .venue-occupied {
-            background-color: #f8d7da;
-            border-color: #721c24;
-        }
-        .approval-actions {
-            display: flex;
-            gap: 0.5rem;
+            margin-top: 1rem;
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="bi bi-shield-check"></i> 校园活动管理系统</a>
+            <a class="navbar-brand" href="#"><i class="bi bi-calendar-event"></i> 校园活动管理系统</a>
             <div class="navbar-nav ms-auto">
-                <span class="navbar-text me-3">管理员: 系统管理员</span>
+                <span class="navbar-text me-3">欢迎, 张三 (参与者)</span>
                 <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right"></i> 退出</a>
             </div>
         </div>
@@ -96,36 +54,31 @@
             <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 sidebar">
                 <div class="d-flex flex-column p-3">
-                    <h6 class="text-muted mb-3">管理功能</h6>
+                    <h6 class="text-muted mb-3">功能菜单</h6>
                     <ul class="nav nav-pills flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/admin/approvals">
-                                <i class="bi bi-clipboard-check"></i> 审批管理
+                            <a class="nav-link active" href="/student/dashboard">
+                                <i class="bi bi-house-door"></i> 主页
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/venues">
-                                <i class="bi bi-building"></i> 场地管理
+                            <a class="nav-link" href="/student/my-activities">
+                                <i class="bi bi-calendar-check"></i> 我的活动
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/activities">
-                                <i class="bi bi-calendar-event"></i> 活动管理
+                            <a class="nav-link" href="/student/progress">
+                                <i class="bi bi-graph-up"></i> 进度提交
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/users">
-                                <i class="bi bi-people"></i> 用户管理
+                            <a class="nav-link" href="/student/requests">
+                                <i class="bi bi-file-earmark-text"></i> 请假申请
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/admin/reports">
-                                <i class="bi bi-graph-up"></i> 统计报告
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/settings">
-                                <i class="bi bi-gear"></i> 系统设置
+                            <a class="nav-link" href="/student/profile">
+                                <i class="bi bi-person"></i> 个人资料
                             </a>
                         </li>
                     </ul>
@@ -135,280 +88,197 @@
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2><i class="bi bi-clipboard-check"></i> 待审批项目</h2>
+                    <h2><i class="bi bi-calendar-event"></i> 可报名活动</h2>
                     <div class="d-flex gap-2">
-                        <select class="form-select" id="typeFilter" style="width: auto;">
-                            <option value="">所有类型</option>
-                            <option value="activity">活动申请</option>
-                            <option value="venue">场地申请</option>
-                            <option value="fund">资金申请</option>
-                            <option value="leave">请假申请</option>
+                        <select class="form-select" id="categoryFilter" style="width: auto;">
+                            <option value="">所有类别</option>
+                            <option value="学术">学术类</option>
+                            <option value="文艺">文艺类</option>
+                            <option value="体育">体育类</option>
+                            <option value="志愿">志愿服务</option>
                         </select>
-                        <select class="form-select" id="priorityFilter" style="width: auto;">
-                            <option value="">所有优先级</option>
-                            <option value="high">高</option>
-                            <option value="medium">中</option>
-                            <option value="low">低</option>
+                        <select class="form-select" id="timeFilter" style="width: auto;">
+                            <option value="">所有时间</option>
+                            <option value="week">本周</option>
+                            <option value="month">本月</option>
                         </select>
-                        <button class="btn btn-outline-primary" onclick="refreshApprovals()">
-                            <i class="bi bi-arrow-clockwise"></i> 刷新
-                        </button>
                     </div>
                 </div>
 
                 <!-- Statistics Cards -->
                 <div class="row mb-4">
                     <div class="col-md-3">
-                        <div class="card text-center bg-warning text-white">
+                        <div class="card text-center bg-light">
                             <div class="card-body">
-                                <h5 class="card-title">12</h5>
-                                <p class="card-text">待审批</p>
+                                <h5 class="card-title text-primary">15</h5>
+                                <p class="card-text">可报名活动</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card text-center bg-success text-white">
+                        <div class="card text-center bg-light">
                             <div class="card-body">
-                                <h5 class="card-title">45</h5>
-                                <p class="card-text">已批准</p>
+                                <h5 class="card-title text-success">3</h5>
+                                <p class="card-text">已参与活动</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card text-center bg-danger text-white">
+                        <div class="card text-center bg-light">
                             <div class="card-body">
-                                <h5 class="card-title">8</h5>
-                                <p class="card-text">已拒绝</p>
+                                <h5 class="card-title text-warning">2</h5>
+                                <p class="card-text">待审核申请</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card text-center bg-info text-white">
+                        <div class="card text-center bg-light">
                             <div class="card-body">
-                                <h5 class="card-title">23</h5>
-                                <p class="card-text">场地空闲</p>
+                                <h5 class="card-title text-info">85</h5>
+                                <p class="card-text">积分总数</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Approval Items -->
-                <div class="row">
-                    <div class="col-lg-8">
-                        <h4>审批列表</h4>
-                        
-                        <!-- Activity Approval -->
-                        <div class="approval-card priority-high">
-                            <div class="approval-header">
+                <!-- Activity Cards -->
+                <div class="row" id="activityList">
+                    <!-- Activity Card 1 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card activity-card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">学术类</span>
+                                <span class="badge bg-success status-badge">招募中</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">Python编程竞赛</h5>
+                                <p class="card-text">面向全校学生的Python编程竞赛，提升编程技能，获得实践经验。</p>
+                                <div class="activity-meta">
+                                    <p><i class="bi bi-calendar"></i> 2024-12-15 至 2024-12-20</p>
+                                    <p><i class="bi bi-geo-alt"></i> 计算机学院机房</p>
+                                    <p><i class="bi bi-people"></i> 需要 20 人，已报名 12 人</p>
+                                    <p><i class="bi bi-clock"></i> 每周 6 小时</p>
+                                </div>
+                            </div>
+                            <div class="card-footer">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-1">
-                                            <span class="badge bg-primary">活动申请</span>
-                                            Python编程竞赛
-                                        </h5>
-                                        <small class="text-muted">申请人: 李明 (计算机学院) | 提交时间: 2024-12-05 14:30</small>
-                                    </div>
-                                    <span class="badge bg-warning status-pending">待审批</span>
-                                </div>
-                            </div>
-                            <div class="approval-body">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <p><strong>活动描述:</strong> 面向全校学生的Python编程竞赛，旨在提升学生编程技能</p>
-                                        <p><strong>活动时间:</strong> 2024-12-15 至 2024-12-20</p>
-                                        <p><strong>预计参与人数:</strong> 20人</p>
-                                        <p><strong>申请场地:</strong> 计算机学院机房A-101</p>
-                                        <p><strong>申请资金:</strong> ¥2000 (奖品费用)</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="approval-actions">
-                                            <button class="btn btn-success btn-sm" onclick="approveItem(1, 'activity')">
-                                                <i class="bi bi-check-circle"></i> 批准
-                                            </button>
-                                            <button class="btn btn-danger btn-sm" onclick="rejectItem(1, 'activity')">
-                                                <i class="bi bi-x-circle"></i> 拒绝
-                                            </button>
-                                            <button class="btn btn-info btn-sm" onclick="viewDetails(1, 'activity')">
-                                                <i class="bi bi-eye"></i> 详情
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Venue Approval -->
-                        <div class="approval-card priority-medium">
-                            <div class="approval-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-1">
-                                            <span class="badge bg-info">场地申请</span>
-                                            学校大礼堂 - 音乐节筹备
-                                        </h5>
-                                        <small class="text-muted">申请人: 王小华 (艺术学院) | 提交时间: 2024-12-04 09:15</small>
-                                    </div>
-                                    <span class="badge bg-warning status-pending">待审批</span>
-                                </div>
-                            </div>
-                            <div class="approval-body">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <p><strong>申请场地:</strong> 学校大礼堂</p>
-                                        <p><strong>使用时间:</strong> 2024-12-18 至 2024-12-22 (每天 14:00-20:00)</p>
-                                        <p><strong>使用目的:</strong> 校园音乐节舞台搭建和彩排</p>
-                                        <p><strong>预计人数:</strong> 50人</p>
-                                        <p><strong>特殊需求:</strong> 需要专业音响设备，舞台灯光</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="approval-actions">
-                                            <button class="btn btn-success btn-sm" onclick="approveVenue(2)">
-                                                <i class="bi bi-check-circle"></i> 批准
-                                            </button>
-                                            <button class="btn btn-danger btn-sm" onclick="rejectItem(2, 'venue')">
-                                                <i class="bi bi-x-circle"></i> 拒绝
-                                            </button>
-                                            <button class="btn btn-info btn-sm" onclick="checkVenueConflict(2)">
-                                                <i class="bi bi-calendar-check"></i> 查看冲突
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Fund Approval -->
-                        <div class="approval-card priority-low">
-                            <div class="approval-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-1">
-                                            <span class="badge bg-success">资金申请</span>
-                                            社区义工服务 - 交通补贴
-                                        </h5>
-                                        <small class="text-muted">申请人: 陈晓 (社会学院) | 提交时间: 2024-12-03 16:45</small>
-                                    </div>
-                                    <span class="badge bg-warning status-pending">待审批</span>
-                                </div>
-                            </div>
-                            <div class="approval-body">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <p><strong>申请金额:</strong> ¥800</p>
-                                        <p><strong>用途:</strong> 参与学生交通补贴</p>
-                                        <p><strong>活动时间:</strong> 2024-12-20 至 2025-01-10</p>
-                                        <p><strong>预计参与人数:</strong> 10人</p>
-                                        <p><strong>预算明细:</strong> 每人每次 ¥20 交通费，共计 4 次活动</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="approval-actions">
-                                            <button class="btn btn-success btn-sm" onclick="approveFund(3)">
-                                                <i class="bi bi-check-circle"></i> 批准
-                                            </button>
-                                            <button class="btn btn-danger btn-sm" onclick="rejectItem(3, 'fund')">
-                                                <i class="bi bi-x-circle"></i> 拒绝
-                                            </button>
-                                            <button class="btn btn-info btn-sm" onclick="viewBudget(3)">
-                                                <i class="bi bi-calculator"></i> 预算
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Leave Request -->
-                        <div class="approval-card priority-medium">
-                            <div class="approval-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-1">
-                                            <span class="badge bg-warning">请假申请</span>
-                                            数据结构学习小组 - 病假
-                                        </h5>
-                                        <small class="text-muted">申请人: 张三 (计算机学院) | 提交时间: 2024-12-06 08:30</small>
-                                    </div>
-                                    <span class="badge bg-warning status-pending">待审批</span>
-                                </div>
-                            </div>
-                            <div class="approval-body">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <p><strong>请假时间:</strong> 2024-12-07 至 2024-12-09</p>
-                                        <p><strong>请假原因:</strong> 因感冒发烧需要休息治疗</p>
-                                        <p><strong>活动名称:</strong> 数据结构学习小组</p>
-                                        <p><strong>影响评估:</strong> 轻微影响，可由其他成员暂时代替</p>
-                                        <p><strong>医疗证明:</strong> 已提供医院诊断证明</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="approval-actions">
-                                            <button class="btn btn-success btn-sm" onclick="approveLeave(4)">
-                                                <i class="bi bi-check-circle"></i> 批准
-                                            </button>
-                                            <button class="btn btn-danger btn-sm" onclick="rejectItem(4, 'leave')">
-                                                <i class="bi bi-x-circle"></i> 拒绝
-                                            </button>
-                                            <button class="btn btn-info btn-sm" onclick="viewMedicalCert(4)">
-                                                <i class="bi bi-file-earmark-medical"></i> 证明
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <small class="text-muted">组织者: 李明</small>
+                                    <button class="btn btn-primary btn-sm" onclick="joinActivity(1)">
+                                        <i class="bi bi-plus-circle"></i> 报名参加
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Venue Management Panel -->
-                    <div class="col-lg-4">
-                        <h4>场地管理</h4>
-                        <div class="venue-grid">
-                            <div class="venue-card venue-available">
-                                <h6>大礼堂</h6>
-                                <p class="small">容量: 500人</p>
-                                <span class="badge bg-success">空闲</span>
+                    <!-- Activity Card 2 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card activity-card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="badge bg-info">文艺类</span>
+                                <span class="badge bg-warning status-badge">即将开始</span>
                             </div>
-                            <div class="venue-card venue-occupied">
-                                <h6>A-101机房</h6>
-                                <p class="small">容量: 50人</p>
-                                <span class="badge bg-danger">占用</span>
+                            <div class="card-body">
+                                <h5 class="card-title">校园音乐节筹备</h5>
+                                <p class="card-text">负责校园音乐节的舞台搭建、音响调试和现场协调工作。</p>
+                                <div class="activity-meta">
+                                    <p><i class="bi bi-calendar"></i> 2024-12-18 至 2024-12-22</p>
+                                    <p><i class="bi bi-geo-alt"></i> 学校大礼堂</p>
+                                    <p><i class="bi bi-people"></i> 需要 15 人，已报名 8 人</p>
+                                    <p><i class="bi bi-clock"></i> 每周 8 小时</p>
+                                </div>
                             </div>
-                            <div class="venue-card venue-available">
-                                <h6>体育馆</h6>
-                                <p class="small">容量: 1000人</p>
-                                <span class="badge bg-success">空闲</span>
-                            </div>
-                            <div class="venue-card venue-available">
-                                <h6>会议室B-201</h6>
-                                <p class="small">容量: 30人</p>
-                                <span class="badge bg-success">空闲</span>
-                            </div>
-                            <div class="venue-card venue-occupied">
-                                <h6>实验室C-301</h6>
-                                <p class="small">容量: 25人</p>
-                                <span class="badge bg-danger">占用</span>
-                            </div>
-                            <div class="venue-card venue-available">
-                                <h6>图书馆报告厅</h6>
-                                <p class="small">容量: 200人</p>
-                                <span class="badge bg-success">空闲</span>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">组织者: 王小华</small>
+                                    <button class="btn btn-primary btn-sm" onclick="joinActivity(2)">
+                                        <i class="bi bi-plus-circle"></i> 报名参加
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Quick Stats -->
-                        <div class="mt-4">
-                            <h5>今日统计</h5>
+                    <!-- Activity Card 3 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card activity-card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="badge bg-success">志愿服务</span>
+                                <span class="badge bg-success status-badge">招募中</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">社区义工服务</h5>
+                                <p class="card-text">前往社区为老年人提供科技使用指导和生活帮助。</p>
+                                <div class="activity-meta">
+                                    <p><i class="bi bi-calendar"></i> 2024-12-20 至 2025-01-10</p>
+                                    <p><i class="bi bi-geo-alt"></i> 附近社区</p>
+                                    <p><i class="bi bi-people"></i> 需要 10 人，已报名 3 人</p>
+                                    <p><i class="bi bi-clock"></i> 每周 4 小时</p>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">组织者: 陈晓</small>
+                                    <button class="btn btn-primary btn-sm" onclick="joinActivity(3)">
+                                        <i class="bi bi-plus-circle"></i> 报名参加
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Card 4 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card activity-card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="badge bg-danger">体育类</span>
+                                <span class="badge bg-secondary status-badge">报名截止</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">篮球联赛组织</h5>
+                                <p class="card-text">协助组织校内篮球联赛，包括赛程安排、裁判协调等。</p>
+                                <div class="activity-meta">
+                                    <p><i class="bi bi-calendar"></i> 2024-12-25 至 2025-01-15</p>
+                                    <p><i class="bi bi-geo-alt"></i> 学校体育馆</p>
+                                    <p><i class="bi bi-people"></i> 需要 12 人，已报名 12 人</p>
+                                    <p><i class="bi bi-clock"></i> 每周 5 小时</p>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">组织者: 刘强</small>
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="bi bi-x-circle"></i> 报名已满
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Progress Section -->
+                <div class="progress-section">
+                    <h4><i class="bi bi-graph-up"></i> 我的活动进度</h4>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <div class="row text-center">
-                                        <div class="col-6">
-                                            <h6 class="text-primary">5</h6>
-                                            <small>新申请</small>
-                                        </div>
-                                        <div class="col-6">
-                                            <h6 class="text-success">8</h6>
-                                            <small>已处理</small>
-                                        </div>
+                                    <h6>数据结构学习小组</h6>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 75%">75%</div>
                                     </div>
+                                    <small class="text-muted">下次提交: 2024-12-10</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6>环保宣传活动</h6>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 50%">50%</div>
+                                    </div>
+                                    <small class="text-muted">下次提交: 2024-12-12</small>
                                 </div>
                             </div>
                         </div>
@@ -418,55 +288,38 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-        <button class="btn btn-primary btn-lg rounded-circle" onclick="showBatchApproval()" title="批量操作">
-            <i class="bi bi-lightning-fill"></i>
-        </button>
-    </div>
-
-    <!-- Approval Modal -->
-    <div class="modal fade" id="approvalModal" tabindex="-1">
+    <!-- Join Activity Modal -->
+    <div class="modal fade" id="joinModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">审批处理</h5>
+                    <h5 class="modal-title">报名活动</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="approvalContent">
-                        <!-- 动态内容 -->
-                    </div>
-                    <div class="mt-3">
-                        <label for="approvalComment" class="form-label">审批意见</label>
-                        <textarea class="form-control" id="approvalComment" rows="3" placeholder="请输入审批意见..."></textarea>
-                    </div>
+                    <form id="joinForm">
+                        <div class="mb-3">
+                            <label for="motivation" class="form-label">报名理由</label>
+                            <textarea class="form-control" id="motivation" rows="3" placeholder="请简述您的报名理由和相关经验..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="availability" class="form-label">时间安排</label>
+                            <select class="form-select" id="availability">
+                                <option value="">选择您的时间安排</option>
+                                <option value="全程参与">全程参与</option>
+                                <option value="部分参与">部分参与</option>
+                                <option value="灵活安排">灵活安排</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="skills" class="form-label">相关技能</label>
+                            <input type="text" class="form-control" id="skills" placeholder="如：编程、设计、组织协调等">
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-success" id="confirmApprove">确认批准</button>
-                    <button type="button" class="btn btn-danger" id="confirmReject">确认拒绝</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Venue Conflict Modal -->
-    <div class="modal fade" id="venueConflictModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">场地冲突检查</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="conflictContent">
-                        <!-- 场地冲突信息 -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary" onclick="suggestAlternativeVenue()">建议其他场地</button>
+                    <button type="button" class="btn btn-primary" onclick="submitJoinForm()">提交报名</button>
                 </div>
             </div>
         </div>
@@ -474,227 +327,75 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let currentApprovalId = null;
-        let currentApprovalType = null;
+        let currentActivityId = null;
 
-        // 批准项目
-        function approveItem(id, type) {
-            currentApprovalId = id;
-            currentApprovalType = type;
-            
-            document.getElementById('approvalContent').innerHTML = `
-                <div class="alert alert-success">
-                    <i class="bi bi-check-circle"></i> 确认批准此${getTypeText(type)}申请？
-                </div>
-            `;
-            
-            document.getElementById('confirmApprove').style.display = 'block';
-            document.getElementById('confirmReject').style.display = 'none';
-            
-            new bootstrap.Modal(document.getElementById('approvalModal')).show();
+        // 报名活动
+        function joinActivity(activityId) {
+            currentActivityId = activityId;
+            new bootstrap.Modal(document.getElementById('joinModal')).show();
         }
 
-        // 拒绝项目
-        function rejectItem(id, type) {
-            currentApprovalId = id;
-            currentApprovalType = type;
-            
-            document.getElementById('approvalContent').innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="bi bi-x-circle"></i> 确认拒绝此${getTypeText(type)}申请？
-                </div>
-            `;
-            
-            document.getElementById('confirmApprove').style.display = 'none';
-            document.getElementById('confirmReject').style.display = 'block';
-            
-            new bootstrap.Modal(document.getElementById('approvalModal')).show();
-        }
+        // 提交报名表单
+        function submitJoinForm() {
+            const motivation = document.getElementById('motivation').value;
+            const availability = document.getElementById('availability').value;
+            const skills = document.getElementById('skills').value;
 
-        // 批准场地申请
-        function approveVenue(id) {
-            // 检查场地冲突
-            fetch(`/admin/check-venue-conflict/${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.hasConflict) {
-                        alert('场地时间冲突，请先解决冲突！');
-                        checkVenueConflict(id);
-                    } else {
-                        approveItem(id, 'venue');
-                    }
-                });
-        }
-
-        // 批准资金申请
-        function approveFund(id) {
-            // 检查预算余额
-            fetch(`/admin/check-budget/${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.insufficient) {
-                        alert('预算不足，当前余额：¥' + data.balance);
-                        return;
-                    }
-                    approveItem(id, 'fund');
-                });
-        }
-
-        // 批准请假申请
-        function approveLeave(id) {
-            approveItem(id, 'leave');
-        }
-
-        // 查看场地冲突
-        function checkVenueConflict(id) {
-            fetch(`/admin/venue-conflict-details/${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('conflictContent').innerHTML = `
-                        <h6>场地：${data.venue}</h6>
-                        <p>申请时间：${data.requestTime}</p>
-                        <h6 class="text-danger">冲突活动：</h6>
-                        <ul>
-                            ${data.conflicts.map(conflict => `
-                                <li>${conflict.activity} (${conflict.time})</li>
-                            `).join('')}
-                        </ul>
-                    `;
-                    new bootstrap.Modal(document.getElementById('venueConflictModal')).show();
-                });
-        }
-
-        // 确认批准
-        document.getElementById('confirmApprove').addEventListener('click', function() {
-            const comment = document.getElementById('approvalComment').value;
-            
-            fetch('/admin/approve', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: currentApprovalId,
-                    type: currentApprovalType,
-                    comment: comment,
-                    action: 'approve'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('审批成功！');
-                    location.reload();
-                } else {
-                    alert('审批失败：' + data.message);
-                }
-            });
-            
-            bootstrap.Modal.getInstance(document.getElementById('approvalModal')).hide();
-        });
-
-        // 确认拒绝
-        document.getElementById('confirmReject').addEventListener('click', function() {
-            const comment = document.getElementById('approvalComment').value;
-            
-            if (!comment.trim()) {
-                alert('拒绝申请时必须填写理由！');
+            if (!motivation.trim()) {
+                alert('请填写报名理由');
                 return;
             }
-            
-            fetch('/admin/approve', {
+
+            if (!availability) {
+                alert('请选择时间安排');
+                return;
+            }
+
+            // 发送报名请求
+            fetch('/student/join-activity', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id: currentApprovalId,
-                    type: currentApprovalType,
-                    comment: comment,
-                    action: 'reject'
+                    activity_id: currentActivityId,
+                    motivation: motivation,
+                    availability: availability,
+                    skills: skills
                 })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('拒绝成功！');
+                    alert('报名成功！等待组织者审核');
+                    bootstrap.Modal.getInstance(document.getElementById('joinModal')).hide();
                     location.reload();
                 } else {
-                    alert('操作失败：' + data.message);
+                    alert('报名失败：' + data.message);
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('网络错误，请稍后重试');
             });
-            
-            bootstrap.Modal.getInstance(document.getElementById('approvalModal')).hide();
-        });
-
-        // 获取类型文本
-        function getTypeText(type) {
-            const types = {
-                'activity': '活动',
-                'venue': '场地',
-                'fund': '资金',
-                'leave': '请假'
-            };
-            return types[type] || type;
-        }
-
-        // 刷新审批列表
-        function refreshApprovals() {
-            location.reload();
-        }
-
-        // 批量操作
-        function showBatchApproval() {
-            alert('批量操作功能开发中...');
-        }
-
-        // 建议其他场地
-        function suggestAlternativeVenue() {
-            alert('建议场地功能开发中...');
-        }
-
-        // 查看详情
-        function viewDetails(id, type) {
-            window.open(`/admin/view-details/${type}/${id}`, '_blank');
-        }
-
-        // 查看预算
-        function viewBudget(id) {
-            window.open(`/admin/budget-details/${id}`, '_blank');
-        }
-
-        // 查看医疗证明
-        function viewMedicalCert(id) {
-            window.open(`/admin/medical-cert/${id}`, '_blank');
         }
 
         // 筛选功能
-        document.getElementById('typeFilter').addEventListener('change', function() {
-            // 实现筛选逻辑
-            console.log('筛选类型:', this.value);
-        });
+        document.getElementById('categoryFilter').addEventListener('change', filterActivities);
+        document.getElementById('timeFilter').addEventListener('change', filterActivities);
 
-        document.getElementById('priorityFilter').addEventListener('change', function() {
-            // 实现筛选逻辑
-            console.log('筛选优先级:', this.value);
-        });
+        function filterActivities() {
+            const category = document.getElementById('categoryFilter').value;
+            const time = document.getElementById('timeFilter').value;
+            
+            // 这里可以添加AJAX请求来筛选活动
+            console.log('筛选条件:', { category, time });
+        }
 
         // 页面加载时的初始化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('管理员审批页面加载完成');
-            
-            // 可以添加定时刷新功能
-            setInterval(function() {
-                // 检查是否有新的待审批项目
-                fetch('/admin/check-new-approvals')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.hasNew) {
-                            // 显示新项目提醒
-                            console.log('有新的待审批项目');
-                        }
-                    });
-            }, 30000); // 每30秒检查一次
+            // 可以在这里添加初始化代码
+            console.log('参与者主页加载完成');
         });
     </script>
 </body>
