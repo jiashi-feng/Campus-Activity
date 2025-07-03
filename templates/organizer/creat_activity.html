@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}创建活动 - 高校活动管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="bi bi-plus-circle"></i> 创建新活动</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">活动名称 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="category" class="form-label">活动类别 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">请选择类别</option>
+                                    <option value="学术讲座">学术讲座</option>
+                                    <option value="技术竞赛">技术竞赛</option>
+                                    <option value="文艺活动">文艺活动</option>
+                                    <option value="体育竞赛">体育竞赛</option>
+                                    <option value="志愿服务">志愿服务</option>
+                                    <option value="社团活动">社团活动</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">活动描述 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="description" name="description" rows="4" required 
+                                  placeholder="请详细描述活动内容、目的、要求等"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="max_participants" class="form-label">最大参与人数</label>
+                                <input type="number" class="form-control" id="max_participants" name="max_participants" 
+                                       min="1" max="500" value="50">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="place_id" class="form-label">活动场地</label>
+                                <select class="form-select" id="place_id" name="place_id">
+                                    <option value="">请选择场地</option>
+                                    {% for place in places %}
+                                    <option value="{{ place.id }}">{{ place.name }} (容量: {{ place.capacity }}人)</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="start_date" class="form-label">开始日期 <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="end_date" class="form-label">结束日期 <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="registration_deadline" class="form-label">报名截止日期 <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="registration_deadline" name="registration_deadline" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="requested_fund" class="form-label">申请资金 (元)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">¥</span>
+                            <input type="number" class="form-control" id="requested_fund" name="requested_fund" 
+                                   min="0" step="0.01" value="0">
+                        </div>
+                        <div class="form-text">如需申请资金支持，请填写预算金额</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">所需特长技能</label>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skill1" value="编程">
+                                    <label class="form-check-label" for="skill1">编程</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skill2" value="设计">
+                                    <label class="form-check-label" for="skill2">设计</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skill3" value="音乐">
+                                    <label class="form-check-label" for="skill3">音乐</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skill4" value="表演">
+                                    <label class="form-check-label" for="skill4">表演</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skill5" value="体育">
+                                    <label class="form-check-label" for="skill5">体育</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skill6" value="写作">
+                                    <label class="form-check-label" for="skill6">写作</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skill7" value="摄影">
+                                    <label class="form-check-label" for="skill7">摄影</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="skill8" value="其他">
+                                    <label class="form-check-label" for="skill8">其他</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>提示：</strong>活动创建后需要等待管理员审批，审批通过后学生才能报名参加。
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('organizer_dashboard') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> 返回
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> 创建活动
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 设置日期输入的最小值为今天
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start_date').min = today;
+    document.getElementById('end_date').min = today;
+    document.getElementById('registration_deadline').min = today;
+    
+    // 确保结束日期不早于开始日期
+    document.getElementById('start_date').addEventListener('change', function() {
+        document.getElementById('end_date').min = this.value;
+        // 报名截止日期应该在开始日期之前
+        if (this.value) {
+            document.getElementById('registration_deadline').max = this.value;
+        }
+    });
+    
+    // 确保报名截止日期不晚于开始日期
+    document.getElementById('registration_deadline').addEventListener('change', function() {
+        const startDate = document.getElementById('start_date').value;
+        if (startDate && this.value > startDate) {
+            alert('报名截止日期不能晚于活动开始日期');
+            this.value = '';
+        }
+    });
+});
+</script>
+{% endblock %}

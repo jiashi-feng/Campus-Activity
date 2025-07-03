@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资金拨款管理 - 高校活动管理系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .main-content {
+            padding: 2rem 0;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #667eea;
+        }
+        .funding-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        .funding-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .activity-level {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .level-high { background-color: #ff6b6b; color: white; }
+        .level-medium { background-color: #ffa726; color: white; }
+        .level-low { background-color: #66bb6a; color: white; }
+        .status-pending { color: #ffa726; }
+        .status-approved { color: #66bb6a; }
+        .status-rejected { color: #f44336; }
+        .btn-approve { background-color: #4caf50; border-color: #4caf50; }
+        .btn-reject { background-color: #f44336; border-color: #f44336; }
+        .progress-custom {
+            height: 8px;
+            border-radius: 4px;
+        }
+        .quarterly-report {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .reward-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-university me-2"></i>高校活动管理系统
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-user-tie me-1"></i>负责老师：张教授
+                </span>
+                <a class="nav-link" href="/teacher/dashboard">
+                    <i class="fas fa-home me-1"></i>主页
+                </a>
+                <a class="nav-link" href="/logout">
+                    <i class="fas fa-sign-out-alt me-1"></i>退出
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <!-- 资金概览统计 -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <i class="fas fa-wallet fa-2x text-primary mb-2"></i>
+                    <h4 class="mb-1">¥50,000</h4>
+                    <p class="text-muted mb-0">总预算</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <i class="fas fa-money-bill-wave fa-2x text-success mb-2"></i>
+                    <h4 class="mb-1">¥32,500</h4>
+                    <p class="text-muted mb-0">已拨款</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <i class="fas fa-piggy-bank fa-2x text-warning mb-2"></i>
+                    <h4 class="mb-1">¥17,500</h4>
+                    <p class="text-muted mb-0">剩余资金</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card text-center">
+                    <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                    <h4 class="mb-1">8</h4>
+                    <p class="text-muted mb-0">待审批申请</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 资金申请处理 -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-hand-holding-usd me-2"></i>资金申请审批
+                    </h4>
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="filter" id="all" checked>
+                        <label class="btn btn-outline-primary" for="all">全部</label>
+                        <input type="radio" class="btn-check" name="filter" id="pending">
+                        <label class="btn btn-outline-warning" for="pending">待审批</label>
+                        <input type="radio" class="btn-check" name="filter" id="approved">
+                        <label class="btn btn-outline-success" for="approved">已通过</label>
+                    </div>
+                </div>
+
+                <!-- 资金申请列表 -->
+                <div class="funding-requests">
+                    <!-- 申请项目1 -->
+                    <div class="funding-card" data-status="pending">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-1 fw-bold">校园创新科技节</h6>
+                                    <span class="activity-level level-high">高级活动</span>
+                                </div>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-user me-1"></i>组织者：李明 (计算机学院)
+                                    <span class="ms-3">
+                                        <i class="fas fa-calendar me-1"></i>2024-03-15 至 2024-03-20
+                                    </span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong>申请用途：</strong>设备租赁、场地布置、奖品购买
+                                </p>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar bg-info" style="width: 45%"></div>
+                                </div>
+                                <small class="text-muted">活动进度：45%</small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    <h5 class="text-primary mb-1">¥8,000</h5>
+                                    <span class="badge bg-warning">待审批</span>
+                                </div>
+                                <div class="btn-group d-grid gap-2">
+                                    <button class="btn btn-approve btn-sm" onclick="approveFunding(1, 8000)">
+                                        <i class="fas fa-check me-1"></i>批准
+                                    </button>
+                                    <button class="btn btn-reject btn-sm" onclick="rejectFunding(1)">
+                                        <i class="fas fa-times me-1"></i>拒绝
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 申请项目2 -->
+                    <div class="funding-card" data-status="pending">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-1 fw-bold">春季运动会</h6>
+                                    <span class="activity-level level-medium">中级活动</span>
+                                </div>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-user me-1"></i>组织者：王芳 (体育学院)
+                                    <span class="ms-3">
+                                        <i class="fas fa-calendar me-1"></i>2024-04-01 至 2024-04-03
+                                    </span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong>申请用途：</strong>体育用品、奖牌制作、医疗保障
+                                </p>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar bg-success" style="width: 70%"></div>
+                                </div>
+                                <small class="text-muted">活动进度：70%</small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    <h5 class="text-primary mb-1">¥5,500</h5>
+                                    <span class="badge bg-warning">待审批</span>
+                                </div>
+                                <div class="btn-group d-grid gap-2">
+                                    <button class="btn btn-approve btn-sm" onclick="approveFunding(2, 5500)">
+                                        <i class="fas fa-check me-1"></i>批准
+                                    </button>
+                                    <button class="btn btn-reject btn-sm" onclick="rejectFunding(2)">
+                                        <i class="fas fa-times me-1"></i>拒绝
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已批准项目 -->
+                    <div class="funding-card" data-status="approved">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-1 fw-bold">文学社诗歌朗诵比赛</h6>
+                                    <span class="activity-level level-low">基础活动</span>
+                                </div>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-user me-1"></i>组织者：陈雅文 (文学院)
+                                    <span class="ms-3">
+                                        <i class="fas fa-calendar me-1"></i>2024-02-20 至 2024-02-25
+                                    </span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong>申请用途：</strong>音响设备、舞台布置、纪念品
+                                </p>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                                </div>
+                                <small class="text-muted">活动进度：已完成</small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    <h5 class="text-success mb-1">¥2,800</h5>
+                                    <span class="badge bg-success">已批准</span>
+                                </div>
+                                <small class="text-muted">批准时间：2024-02-18</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="col-lg-4">
+                <!-- 快速拨款 -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-bolt me-2"></i>快速拨款
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <form id="quickFundingForm">
+                            <div class="mb-3">
+                                <label class="form-label">活动名称</label>
+                                <select class="form-select" id="activitySelect">
+                                    <option value="">请选择活动</option>
+                                    <option value="1">校园创新科技节</option>
+                                    <option value="2">春季运动会</option>
+                                    <option value="3">艺术节演出</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">拨款金额</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">¥</span>
+                                    <input type="number" class="form-control" id="fundingAmount" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">备注</label>
+                                <textarea class="form-control" rows="3" placeholder="拨款说明或条件"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-paper-plane me-1"></i>立即拨款
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 最近拨款记录 -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-history me-2"></i>最近拨款记录
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="funding-history">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <small class="fw-bold">文学社诗歌比赛</small>
+                                    <br>
+                                    <small class="text-muted">2024-02-18</small>
+                                </div>
+                                <span class="badge bg-success">¥2,800</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <small class="fw-bold">社团招新活动</small>
+                                    <br>
+                                    <small class="text-muted">2024-02-15</small>
+                                </div>
+                                <span class="badge bg-success">¥1,500</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="fw-bold">学术讲座</small>
+                                    <br>
+                                    <small class="text-muted">2024-02-12</small>
+                                </div>
+                                <span class="badge bg-success">¥3,200</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 季度奖励管理 -->
+        <div class="quarterly-report">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4 class="mb-3">
+                        <i class="fas fa-trophy me-2"></i>2024年第一季度奖励统计
+                    </h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="reward-item">
+                                <h6 class="mb-1">优秀组织者</h6>
+                                <p class="mb-0">3人 × ¥500奖金 = ¥1,500</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="reward-item">
+                                <h6 class="mb-1">活跃参与者</h6>
+                                <p class="mb-0">10人 × ¥200奖金 = ¥2,000</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="reward-item">
+                                <h6 class="mb-1">最佳创新活动</h6>
+                                <p class="mb-0">1项 × ¥1,000奖金 = ¥1,000</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="reward-item">
+                                <h6 class="mb-1">特长发展奖</h6>
+                                <p class="mb-0">5人 × ¥300奖金 = ¥1,500</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="reward-summary">
+                        <h3 class="mb-2">总奖励金额</h3>
+                        <h2 class="mb-3">¥6,000</h2>
+                        <button class="btn btn-light btn-lg" onclick="generateReward()">
+                            <i class="fas fa-gift me-2"></i>生成奖励方案
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 拨款确认模态框 -->
+    <div class="modal fade" id="fundingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">确认拨款</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>您确定要为 <span id="modalActivityName" class="fw-bold"></span> 拨款 <span id="modalAmount" class="fw-bold text-primary"></span> 元吗？</p>
+                    <div class="mb-3">
+                        <label class="form-label">拨款说明</label>
+                        <textarea class="form-control" id="fundingNote" rows="3" placeholder="请输入拨款说明或条件"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmFunding()">确认拨款</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentFundingId = null;
+        let currentAmount = null;
+
+        // 拨款审批函数
+        function approveFunding(id, amount) {
+            currentFundingId = id;
+            currentAmount = amount;
+            
+            // 获取活动名称
+            const activityName = document.querySelector(`[data-status="pending"]`).querySelector('h6').textContent;
+            document.getElementById('modalActivityName').textContent = activityName;
+            document.getElementById('modalAmount').textContent = amount.toLocaleString();
+            
+            // 显示模态框
+            new bootstrap.Modal(document.getElementById('fundingModal')).show();
+        }
+
+        // 确认拨款
+        function confirmFunding() {
+            const note = document.getElementById('fundingNote').value;
+            
+            // 这里应该发送到后端
+            console.log(`拨款确认: ID=${currentFundingId}, 金额=${currentAmount}, 说明=${note}`);
+            
+            // 模拟拨款成功
+            alert('拨款成功！');
+            
+            // 更新UI
+            const card = document.querySelector(`[data-status="pending"]`);
+            if (card) {
+                card.setAttribute('data-status', 'approved');
+                const badge = card.querySelector('.badge');
+                badge.className = 'badge bg-success';
+                badge.textContent = '已批准';
+                
+                // 隐藏按钮
+                const buttonGroup = card.querySelector('.btn-group');
+                buttonGroup.innerHTML = '<small class="text-muted">批准时间：' + new Date().toLocaleDateString() + '</small>';
+            }
+            
+            // 关闭模态框
+            bootstrap.Modal.getInstance(document.getElementById('fundingModal')).hide();
+        }
+
+        // 拒绝拨款
+        function rejectFunding(id) {
+            if (confirm('确定要拒绝这个拨款申请吗？')) {
+                console.log(`拒绝拨款: ID=${id}`);
+                
+                // 更新UI
+                const card = document.querySelector(`[data-status="pending"]`);
+                if (card) {
+                    card.setAttribute('data-status', 'rejected');
+                    const badge = card.querySelector('.badge');
+                    badge.className = 'badge bg-danger';
+                    badge.textContent = '已拒绝';
+                    
+                    // 隐藏按钮
+                    const buttonGroup = card.querySelector('.btn-group');
+                    buttonGroup.innerHTML = '<small class="text-muted">拒绝时间：' + new Date().toLocaleDateString() + '</small>';
+                }
+                
+                alert('已拒绝拨款申请！');
+            }
+        }
+
+        // 筛选功能
+        document.querySelectorAll('input[name="filter"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const filter = this.id;
+                const cards = document.querySelectorAll('.funding-card');
+                
+                cards.forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-status') === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 快速拨款表单
+        document.getElementById('quickFundingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const activity = document.getElementById('activitySelect').value;
+            const amount = document.getElementById('fundingAmount').value;
+            
+            if (!activity || !amount) {
+                alert('请完整填写拨款信息！');
+                return;
+            }
+            
+            if (confirm(`确定要为选定活动拨款 ¥${amount} 元吗？`)) {
+                console.log(`快速拨款: 活动=${activity}, 金额=${amount}`);
+                alert('拨款成功！');
+                
+                // 重置表单
+                this.reset();
+            }
+        });
+
+        // 生成奖励方案
+        function generateReward() {
+            if (confirm('确定要生成本季度奖励方案吗？')) {
+                console.log('生成奖励方案');
+                alert('奖励方案已生成并发送给相关人员！');
+            }
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('资金拨款界面已加载');
+            
+            // 可以在这里添加其他初始化代码
+            // 比如从服务器获取最新的申请数据
+        });
+    </script>
+</body>
+</html>
